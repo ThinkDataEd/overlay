@@ -1,3 +1,76 @@
+#' get_teacher_code
+#'
+#' If teacher launched app, gets teacher code.
+#'
+#' @return The teacher code.
+get_teacher_code <- function() {
+  query <- shiny::parseQueryString(session$clientData$url_search)
+
+  query$teacherCode
+}
+
+#' mark_used
+#'
+#' Marks teacher code as used.
+#'
+#' @param code Teacher code to mark as used.
+mark_used <- function(code) {
+  base_url <- "https://firestore.googleapis.com/v1/projects/msportal-accesscontrol/databases/(default)/documents/"
+  full_url <- paste0(base_url, "launches/", code)
+  access_token <- get_access_token()
+
+  body <- list(
+    fields = list(
+      used = list(booleanValue = TRUE)
+    )
+  )
+
+  req <- httr2::request(full_url) |>
+    httr2::req_auth_bearer_token(access_token) |>
+    httr2::req_method("PATCH") |>
+    httr2::req_url_query(`updateMask.fieldPaths` = "used") |>
+    httr2::req_body_json(body)
+
+  resp <- httr2::req_perform(req)
+  httr2::resp_body_json(resp)
+}
+
+#' teacher_code_is_valid
+#'
+#' Checks if teacher code is valid.
+#'
+#' @return Whether teacher code is valid.
+teacher_code_is_valid <- function() {
+  teacher_code <- get_teacher_code()
+
+  # if teacher code is null, it is not valid
+  if(is.null(teacher_code) || teacher_code == "") {
+    return(FALSE)
+  }
+
+  teacher_codes <- read_firebase("launches")
+  codes <- sapply(teacher_codes$documents, function(x) x$fields$token$stringValue)
+  # check that doc exists
+  if(!(teacher_code %in% codes)) {
+    return(FALSE)
+  }
+  fields <- teacher_codes$documents[[which(teacher_code == codes)[1]]]$fields
+  # check that code is active
+  if(fields$used$booleanValue) {
+    return(FALSE)
+  }
+  # mark code as used
+  mark_used(teacher_code)
+  # check that expiresAt is in the future
+  ts <- fields$expiresAt$timestampValue
+  time <- as.POSIXct(
+    ts,
+    format = "%Y-%m-%dT%H:%M:%OSZ",
+    tz = "UTC"
+  )
+  return(time > Sys.time())
+}
+
 #' overlay
 #'
 #' Shrouds shiny app behind overlay.
@@ -33,7 +106,9 @@ overlay <- function(input, output, session, duration = 90) {
     ))
   }
 
-  show_overlay()
+  if(!teacher_code_is_valid()) {
+    show_overlay()
+  }
 
   shiny::observeEvent(input$submit_code, {
     class_code <- input$class_code
