@@ -4,7 +4,10 @@
 \alias{teacher_code_is_valid}
 \title{teacher_code_is_valid}
 \usage{
-teacher_code_is_valid()
+teacher_code_is_valid(session)
+}
+\arguments{
+\item{session}{Shiny session.}
 }
 \value{
 Whether teacher code is valid.

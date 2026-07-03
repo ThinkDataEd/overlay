@@ -2,8 +2,10 @@
 #'
 #' If teacher launched app, gets teacher code.
 #'
+#' @param session Shiny session.
+#'
 #' @return The teacher code.
-get_teacher_code <- function() {
+get_teacher_code <- function(session) {
   query <- shiny::parseQueryString(session$clientData$url_search)
 
   query$teacherCode
@@ -39,9 +41,11 @@ mark_used <- function(code) {
 #'
 #' Checks if teacher code is valid.
 #'
+#' @param session Shiny session.
+#'
 #' @return Whether teacher code is valid.
-teacher_code_is_valid <- function() {
-  teacher_code <- get_teacher_code()
+teacher_code_is_valid <- function(session) {
+  teacher_code <- get_teacher_code(session)
 
   # if teacher code is null, it is not valid
   if(is.null(teacher_code) || teacher_code == "") {
@@ -106,11 +110,13 @@ overlay <- function(input, output, session, duration = 90) {
     ))
   }
 
-  # if(!teacher_code_is_valid()) {
-  #   show_overlay()
-  # }
+  shiny::observe({
+    valid <- teacher_code_is_valid(session)
 
-  show_overlay()
+    if (isFALSE(valid) && !gate$unlocked) {
+      show_overlay()
+    }
+  })
 
   shiny::observeEvent(input$submit_code, {
     class_code <- input$class_code

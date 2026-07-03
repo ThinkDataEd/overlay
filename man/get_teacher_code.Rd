@@ -4,7 +4,10 @@
 \alias{get_teacher_code}
 \title{get_teacher_code}
 \usage{
-get_teacher_code()
+get_teacher_code(session)
+}
+\arguments{
+\item{session}{Shiny session.}
 }
 \value{
 The teacher code.
