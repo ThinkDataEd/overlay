@@ -49,7 +49,7 @@ teacher_code_is_valid <- function(session) {
 
   # if teacher code is null, it is not valid
   if(is.null(teacher_code) || teacher_code == "") {
-    return(FALSE)
+    return(NULL)
   }
 
   teacher_codes <- read_firebase("launches")
@@ -91,7 +91,7 @@ overlay <- function(input, output, session, duration = 90) {
     expired = FALSE
   )
 
-  show_overlay <- function(expired = FALSE) {
+  show_student_overlay <- function(expired = FALSE) {
     shiny::showModal(shiny::modalDialog(
       title = if(expired) {
         "Session expired"
@@ -110,15 +110,39 @@ overlay <- function(input, output, session, duration = 90) {
     ))
   }
 
+  show_teacher_overlay <- function() {
+    shiny::showModal(shiny::modalDialog(
+      title = "Session expired",
+      shiny::p("This session is expired or invalid. Start a new session from Dashboard."),
+      easyClose = FALSE
+    ))
+  }
+
   shiny::observe({
     valid <- teacher_code_is_valid(session)
 
-    if (isFALSE(valid) && !gate$unlocked) {
-      show_overlay()
+    if (gate$expired) {
+      return()
+    }
+
+    if(is.null(valid)  && !gate$unlocked) {
+      show_student_overlay()
+    }
+
+    else if(isFALSE(valid) && !gate$unlocked) {
+      show_teacher_overlay()
+    }
+
+    else if(isTRUE(valid) && !gate$unlocked) {
+      gate$unlocked <- TRUE
+      gate$unlocked_at <- Sys.time()
+      gate$expired <- FALSE
     }
   })
 
   shiny::observeEvent(input$submit_code, {
+    shiny::req(!gate$expired)
+
     class_code <- input$class_code
 
     if(code_is_valid(class_code)) {
@@ -147,7 +171,7 @@ overlay <- function(input, output, session, duration = 90) {
     if(elapsed >= duration && !gate$expired) {
       gate$unlocked <- FALSE
       gate$expired <- TRUE
-      show_overlay(expired = TRUE)
+      show_teacher_overlay()
     }
   })
 
