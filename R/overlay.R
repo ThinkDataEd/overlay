@@ -106,9 +106,13 @@ overlay <- function(input, output, session, duration = 90) {
     ))
   }
 
-  if(!teacher_code_is_valid()) {
-    show_overlay()
-  }
+  shiny::observe({
+    valid <- teacher_code_is_valid()
+
+    if (isFALSE(valid) && !gate$unlocked) {
+      show_overlay()
+    }
+  })
 
   shiny::observeEvent(input$submit_code, {
     class_code <- input$class_code
