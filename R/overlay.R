@@ -89,7 +89,6 @@ overlay <- function(input, output, session, duration = 90) {
   request_code_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
       title = "Class code required",
-      shiny::p("This class code has expired. Ask your teacher to generate a new one."),
       shiny::textInput(session$ns("class_code"), "Class code"),
       footer = shiny::tagList(
         shiny::actionButton(session$ns("submit_code"), "Submit")
