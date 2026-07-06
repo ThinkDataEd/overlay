@@ -4,12 +4,8 @@
 #'
 #' @return The access token.
 get_access_token <- function() {
-  cred_path <- Sys.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
-  if (cred_path == "" || !file.exists(cred_path)) {
-    # Fall back to default ADC location
-    cred_path <- path.expand("~/.config/gcloud/application_default_credentials.json")
-  }
+  cred_path <- Sys.getenv("OVERLAY_CREDENTIALS")
 
   creds <- jsonlite::fromJSON(cred_path)
 

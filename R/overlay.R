@@ -91,17 +91,10 @@ overlay <- function(input, output, session, duration = 90) {
     expired = FALSE
   )
 
-  show_student_overlay <- function(expired = FALSE) {
+  request_code_overlay <- function(expired = FALSE) {
     shiny::showModal(shiny::modalDialog(
-      title = if(expired) {
-        "Session expired"
-      }
-      else {
-        "Class code required"
-      },
-      if(expired) {
-        shiny::p("This class code has expired. Ask your teacher to generate a new one.")
-      },
+      title = "Class code required",
+      shiny::p("This class code has expired. Ask your teacher to generate a new one."),
       shiny::textInput(session$ns("class_code"), "Class code"),
       footer = shiny::tagList(
         shiny::actionButton(session$ns("submit_code"), "Submit")
@@ -110,7 +103,7 @@ overlay <- function(input, output, session, duration = 90) {
     ))
   }
 
-  show_teacher_overlay <- function() {
+  expired_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
       title = "Session expired",
       shiny::p("This session is expired or invalid. Start a new session from Dashboard."),
@@ -118,21 +111,26 @@ overlay <- function(input, output, session, duration = 90) {
     ))
   }
 
+  # observe teacher code
   shiny::observe({
     valid <- teacher_code_is_valid(session)
 
+    # if expired, show expired overlay
     if (gate$expired) {
-      return()
+      expired_overlay()
     }
 
-    if(is.null(valid)  && !gate$unlocked) {
-      show_student_overlay()
+    # else if the teacher code is NULL and the gate is locked, show request code overlay
+    else if(is.null(valid)  && !gate$unlocked) {
+      request_code_overlay()
     }
 
-    else if(isFALSE(valid) && !gate$unlocked) {
-      show_teacher_overlay()
+    # else if the teacher code is invalid, show expired overlay
+    else if(isFALSE(valid)) {
+      expired_overlay()
     }
 
+    # else if the teacher code is valid and the gate is locked, unlock the gate
     else if(isTRUE(valid) && !gate$unlocked) {
       gate$unlocked <- TRUE
       gate$unlocked_at <- Sys.time()
@@ -140,7 +138,9 @@ overlay <- function(input, output, session, duration = 90) {
     }
   })
 
+  # upon code submission
   shiny::observeEvent(input$submit_code, {
+    # require gate not expired. If the gate is expired, we don't want to remove overlay
     shiny::req(!gate$expired)
 
     class_code <- input$class_code
@@ -159,6 +159,7 @@ overlay <- function(input, output, session, duration = 90) {
     }
   })
 
+  # every second, if gate is unlocked, check if duration has expired
   shiny::observe({
     shiny::invalidateLater(1000, session)
 
@@ -171,7 +172,7 @@ overlay <- function(input, output, session, duration = 90) {
     if(elapsed >= duration && !gate$expired) {
       gate$unlocked <- FALSE
       gate$expired <- TRUE
-      show_teacher_overlay()
+      expired_overlay()
     }
   })
 
