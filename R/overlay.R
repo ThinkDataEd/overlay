@@ -91,7 +91,7 @@ overlay <- function(input, output, session, duration = 90) {
     expired = FALSE
   )
 
-  request_code_overlay <- function(expired = FALSE) {
+  request_code_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
       title = "Class code required",
       shiny::p("This class code has expired. Ask your teacher to generate a new one."),
@@ -104,6 +104,14 @@ overlay <- function(input, output, session, duration = 90) {
   }
 
   expired_overlay <- function() {
+    shiny::showModal(shiny::modalDialog(
+      title = "Session expired",
+      shiny::p("This session is expired. Start a new session from Dashboard."),
+      easyClose = FALSE
+    ))
+  }
+
+  invalid_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
       title = "Session expired",
       shiny::p("This session is expired or invalid. Start a new session from Dashboard."),
@@ -121,13 +129,13 @@ overlay <- function(input, output, session, duration = 90) {
     }
 
     # else if the teacher code is NULL and the gate is locked, show request code overlay
-    else if(is.null(valid)  && !gate$unlocked) {
+    else if(is.null(valid) && !gate$unlocked) {
       request_code_overlay()
     }
 
     # else if the teacher code is invalid, show expired overlay
     else if(isFALSE(valid)) {
-      expired_overlay()
+      invalid_overlay()
     }
 
     # else if the teacher code is valid and the gate is locked, unlock the gate
