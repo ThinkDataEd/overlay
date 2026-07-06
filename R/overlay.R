@@ -134,7 +134,7 @@ overlay <- function(input, output, session, duration = 90) {
     }
 
     # else if the teacher code is invalid, show expired overlay
-    else if(isFALSE(valid)) {
+    else if(isFALSE(valid) && !gate$unlocked) {
       invalid_overlay()
     }
 
