@@ -142,7 +142,6 @@ overlay <- function(input, output, session, duration = 90) {
       gate$unlocked <- TRUE
       gate$unlocked_at <- Sys.time()
       gate$expired <- FALSE
-      shiny::removeModal()
     }
 
     else if(isFALSE(valid)) {
