@@ -189,7 +189,7 @@ overlay <- function(input, output, session, duration = 90) {
   # on clicking dismiss, close the app
   shiny::observeEvent(input$dismiss_expired, {
     shiny::stopApp()
-  })
+  }, ignoreInit = TRUE)
 
   invisible(gate)
 }
