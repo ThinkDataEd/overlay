@@ -100,7 +100,11 @@ overlay <- function(input, output, session, duration = 90) {
   expired_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
       title = "Session expired",
-      shiny::p("This session is expired. Start a new session from Dashboard."),
+      shiny::p(shiny::span("This session is expired. Start a new session from Dashboard.", style = "color: red;")),
+      footer = shiny::actionButton(
+        session$ns("dismiss_expired"),
+        "Dismiss"
+      ),
       easyClose = FALSE
     ))
   }
@@ -108,7 +112,11 @@ overlay <- function(input, output, session, duration = 90) {
   invalid_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
       title = "Session expired",
-      shiny::p("This session is expired or invalid. Start a new session from Dashboard."),
+      shiny::p(shiny::span("This session is expired or invalid. Start a new session from Dashboard.", style = "color: red;")),
+      footer = shiny::actionButton(
+        session$ns("dismiss_expired"),
+        "Dismiss"
+      ),
       easyClose = FALSE
     ))
   }
@@ -177,6 +185,11 @@ overlay <- function(input, output, session, duration = 90) {
       gate$expired <- TRUE
       expired_overlay()
     }
+  })
+
+  # on clicking dismiss, close the app
+  shiny::observeEvent(input$dismiss_expired, {
+    shiny::stopApp()
   })
 
   invisible(gate)
