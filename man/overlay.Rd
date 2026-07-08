@@ -4,7 +4,7 @@
 \alias{overlay}
 \title{overlay}
 \usage{
-overlay(input, output, session, duration = 90)
+overlay(input, output, session, duration = 90, forceClassCode = FALSE)
 }
 \arguments{
 \item{input}{Shiny input.}

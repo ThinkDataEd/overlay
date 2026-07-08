@@ -84,7 +84,7 @@ teacher_code_is_valid <- function(session) {
 #' @param session Shiny session.
 #' @param duration Time in minutes until session expiry.
 #' @export
-overlay <- function(input, output, session, duration = 90) {
+overlay <- function(input, output, session, duration = 90, forceClassCode = FALSE) {
 
   request_code_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
@@ -139,9 +139,14 @@ overlay <- function(input, output, session, duration = 90) {
     }
 
     else if(isTRUE(valid)) {
-      gate$unlocked <- TRUE
-      gate$unlocked_at <- Sys.time()
-      gate$expired <- FALSE
+      if(forceClassCode) {
+        request_code_overlay()
+      }
+      else {
+        gate$unlocked <- TRUE
+        gate$unlocked_at <- Sys.time()
+        gate$expired <- FALSE
+      }
     }
 
     else if(isFALSE(valid)) {
