@@ -88,9 +88,12 @@ overlay <- function(input, output, session, duration = 90) {
 
   request_code_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
-      div(
+      title = shiny::span(
         style = "color: black;",
-        title = "Class code required",
+        "Class code required"
+      ),
+      shiny::div(
+        style = "color: black;",
         shiny::textInput(session$ns("class_code"), "Class code")
       ),
       footer = shiny::tagList(
@@ -102,9 +105,12 @@ overlay <- function(input, output, session, duration = 90) {
 
   invalid_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
-      div(
+      title = shiny::span(
         style = "color: red;",
-        title = "Session expired",
+        "Session expired or invalid"
+      ),
+      shiny::div(
+        style = "color: red;",
         shiny::p("This session is expired or invalid. Start a new session from Dashboard.")
       ),
       footer = shiny::actionButton(
