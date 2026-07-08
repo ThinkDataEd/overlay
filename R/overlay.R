@@ -88,8 +88,11 @@ overlay <- function(input, output, session, duration = 90) {
 
   request_code_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
-      title = "Class code required",
-      shiny::textInput(session$ns("class_code"), "Class code"),
+      div(
+        style = "color: black;",
+        title = "Class code required",
+        shiny::textInput(session$ns("class_code"), "Class code")
+      ),
       footer = shiny::tagList(
         shiny::actionButton(session$ns("submit_code"), "Submit")
       ),
@@ -97,22 +100,13 @@ overlay <- function(input, output, session, duration = 90) {
     ))
   }
 
-  expired_overlay <- function() {
-    shiny::showModal(shiny::modalDialog(
-      title = "Session expired",
-      shiny::p(shiny::span("This session is expired. Start a new session from Dashboard.", style = "color: red;")),
-      footer = shiny::actionButton(
-        session$ns("dismiss_expired"),
-        "Dismiss"
-      ),
-      easyClose = FALSE
-    ))
-  }
-
   invalid_overlay <- function() {
     shiny::showModal(shiny::modalDialog(
-      title = "Session expired",
-      shiny::p(shiny::span("This session is expired or invalid. Start a new session from Dashboard.", style = "color: red;")),
+      div(
+        style = "color: red;",
+        title = "Session expired",
+        shiny::p("This session is expired or invalid. Start a new session from Dashboard.")
+      ),
       footer = shiny::actionButton(
         session$ns("dismiss_expired"),
         "Dismiss"
@@ -182,7 +176,7 @@ overlay <- function(input, output, session, duration = 90) {
     if(elapsed >= duration && !gate$expired) {
       gate$unlocked <- FALSE
       gate$expired <- TRUE
-      expired_overlay()
+      invalid_overlay()
     }
   })
 
