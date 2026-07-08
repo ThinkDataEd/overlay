@@ -125,7 +125,8 @@ overlay <- function(input, output, session, duration = 90, forceClassCode = FALS
   gate <- shiny::reactiveValues(
     unlocked = FALSE,
     unlocked_at = NULL,
-    expired = FALSE
+    expired = FALSE,
+    lock_dashboard = TRUE
   )
 
   # a valid teacher code unlocks the gate and starts timer
@@ -147,6 +148,7 @@ overlay <- function(input, output, session, duration = 90, forceClassCode = FALS
         gate$unlocked_at <- Sys.time()
         gate$expired <- FALSE
       }
+      gate$lock_dashboard <- FALSE
     }
 
     else if(isFALSE(valid)) {
