@@ -126,7 +126,8 @@ overlay <- function(input, output, session, duration = 90, forceClassCode = FALS
     unlocked = FALSE,
     unlocked_at = NULL,
     expired = FALSE,
-    lock_dashboard = TRUE
+    lock_dashboard = TRUE,
+    class_code = ""
   )
 
   # a valid teacher code unlocks the gate and starts timer
@@ -166,6 +167,7 @@ overlay <- function(input, output, session, duration = 90, forceClassCode = FALS
       gate$unlocked <- TRUE
       gate$unlocked_at <- Sys.time()
       gate$expired <- FALSE
+      gate$class_code <- class_code
       shiny::removeModal()
     }
     else {
