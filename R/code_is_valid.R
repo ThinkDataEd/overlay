@@ -1,9 +1,9 @@
-#' get_access_token
+#' get_access_token_temp
 #'
-#' Gets firebase access token.
+#' Gets temporary firebase access token.
 #'
-#' @return The access token.
-get_access_token <- function() {
+#' @return The temporary access token.
+get_access_token_temp <- function() {
 
   cred_path <- Sys.getenv("OVERLAY_CREDENTIALS")
 
@@ -22,6 +22,18 @@ get_access_token <- function() {
   httr2::resp_body_json(resp)$access_token
 }
 
+#' get_access_token
+#'
+#' Gets firebase access token.
+#'
+#' @return The access token.
+get_access_token <- function() {
+  cred_path <- Sys.getenv("OVERLAY_CREDENTIALS")
+
+  googleAuthR::gar_auth_service(json_file = cred_path)
+
+  googleAuthR::gar_token()$auth_token$credentials$access_token
+}
 
 #' read_firebase
 #'
