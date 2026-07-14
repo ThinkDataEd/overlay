@@ -30,6 +30,11 @@ get_access_token_temp <- function() {
 get_access_token <- function() {
   cred_path <- Sys.getenv("OVERLAY_CREDENTIALS")
 
+  options(
+    googleAuthR.scopes.selected =
+      "https://www.googleapis.com/auth/datastore"
+  )
+
   googleAuthR::gar_auth_service(json_file = cred_path)
 
   googleAuthR::gar_token()$auth_token$credentials$access_token
