@@ -4,7 +4,7 @@
 \alias{code_is_valid}
 \title{is_code_valid}
 \usage{
-code_is_valid(code)
+code_is_valid(code, appName)
 }
 \arguments{
 \item{code}{Class code.}

@@ -65,7 +65,7 @@ read_firebase <- function(path) {
 #' @param code Class code.
 #'
 #' @return Logical indicating whether the supplied code is valid.
-code_is_valid <- function(code) {
+code_is_valid <- function(code, appName) {
   classCodes <- read_firebase("classCodes")
   codes <- sapply(classCodes$documents, function(x) x$fields$code$stringValue)
   # check that doc exists
@@ -75,6 +75,10 @@ code_is_valid <- function(code) {
   fields <- classCodes$documents[[which(code == codes)[1]]]$fields
   # check that code is active
   if(!fields$active$booleanValue) {
+    return(FALSE)
+  }
+  # check that app is correct
+  if(appName != fields$appName$stringValue) {
     return(FALSE)
   }
   # check that expiresAt is in the future
