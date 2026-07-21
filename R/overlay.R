@@ -89,7 +89,7 @@ get_teacher_email <- function(session) {
   codes <- sapply(teacher_codes$documents, function(x) x$fields$token$stringValue)
   emails <- sapply(teacher_codes$documents, function(x) x$fields$teacherEmail$stringValue)
 
-  emails[which(codes == teacher_codes)]
+  emails[which(codes == teacher_code)]
 }
 
 #' overlay
@@ -153,7 +153,6 @@ overlay <- function(input, output, session, appName, duration = 90, forceClassCo
     shiny::req(!gate$unlocked, !gate$expired)
 
     valid <- teacher_code_is_valid(session)
-    gate$teacher_email <- get_teacher_email(session)
 
     if(is.null(valid)) {
       request_code_overlay()
@@ -167,6 +166,7 @@ overlay <- function(input, output, session, appName, duration = 90, forceClassCo
         gate$unlocked <- TRUE
         gate$unlocked_at <- Sys.time()
         gate$expired <- FALSE
+        gate$teacher_email <- get_teacher_email(session)
       }
       gate$lock_dashboard <- FALSE
     }
