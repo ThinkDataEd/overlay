@@ -153,7 +153,7 @@ overlay <- function(input, output, session, appName, duration = 90, forceClassCo
     shiny::req(!gate$unlocked, !gate$expired)
 
     valid <- teacher_code_is_valid(session)
-    gate$teacher_email <- get_teacher_email()
+    gate$teacher_email <- get_teacher_email(session)
 
     if(is.null(valid)) {
       request_code_overlay()
