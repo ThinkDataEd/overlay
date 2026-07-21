@@ -51,11 +51,30 @@ read_firebase <- function(path) {
   base_url <- "https://firestore.googleapis.com/v1/projects/msportal-accesscontrol/databases/(default)/documents/"
   full_url <- paste0(base_url, path)
   access_token <- get_access_token()
-  req <- httr2::request(full_url) |>
-    httr2::req_auth_bearer_token(access_token) |>
-    httr2::req_method("GET")
-  resp <- httr2::req_perform(req)
-  return(httr2::resp_body_json(resp))
+
+  out <- list()
+  nextPageToken <- NULL
+
+  repeat {
+    req <- httr2::request(full_url) |>
+      httr2::req_auth_bearer_token(access_token) |>
+      httr2::req_url_query(
+        pageToken = nextPageToken
+      )
+
+    resp <- httr2::req_perform(req)
+    page <- httr2::resp_body_json(resp)
+
+    out$documents <- c(out$documents, page$documents)
+
+    if(is.null(page$nextPageToken)) {
+      break
+    }
+    else {
+      nextPageToken <- page$nextPageToken
+    }
+  }
+  out
 }
 
 #' is_code_valid
