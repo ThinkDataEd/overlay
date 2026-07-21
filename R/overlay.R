@@ -75,6 +75,23 @@ teacher_code_is_valid <- function(session) {
   return(time > Sys.time())
 }
 
+#' get_teacher_email
+#'
+#' Gets teacher email
+#'
+#' @param session Shiny session.
+#'
+#' @return Teacher email
+get_teacher_email <- function(session) {
+  teacher_code <- get_teacher_code(session)
+
+  teacher_codes <- read_firebase("launches")
+  codes <- sapply(teacher_codes$documents, function(x) x$fields$token$stringValue)
+  emails <- sapply(teacher_codes$documents, function(x) x$fields$teacherEmail$stringValue)
+
+  emails[which(codes == teacher_codes)]
+}
+
 #' overlay
 #'
 #' Shrouds shiny app behind overlay.
@@ -127,7 +144,8 @@ overlay <- function(input, output, session, appName, duration = 90, forceClassCo
     unlocked_at = NULL,
     expired = FALSE,
     lock_dashboard = TRUE,
-    class_code = ""
+    class_code = "",
+    teacher_email = ""
   )
 
   # a valid teacher code unlocks the gate and starts timer
@@ -135,6 +153,7 @@ overlay <- function(input, output, session, appName, duration = 90, forceClassCo
     shiny::req(!gate$unlocked, !gate$expired)
 
     valid <- teacher_code_is_valid(session)
+    gate$teacher_email <- get_teacher_email
 
     if(is.null(valid)) {
       request_code_overlay()
